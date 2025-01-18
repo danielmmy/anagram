@@ -45,6 +45,33 @@ pub fn is_anagram_array(word1: impl Into<String>, word2: impl Into<String>) -> b
     counts.iter().all(|v| *v == 0)
 }
 
+pub fn is_anagram_ascii_array(
+    word1: impl Into<String>,
+    word2: impl Into<String>,
+) -> Result<bool, &'static str> {
+    let word1: Vec<char> = Into::<String>::into(word1).chars().collect();
+    let word2: Vec<char> = Into::<String>::into(word2).chars().collect();
+    if word1.len() != word2.len() {
+        return Ok(false);
+    }
+    let err_message = "invalid character";
+    let mut counts: [i16; 256] = [0; 256];
+    for i in 0..word1.len() {
+        counts[if word1[i].is_ascii() {
+            word1[i] as usize
+        } else {
+            return Err(err_message);
+        }] += 1;
+        counts[if word2[i].is_ascii() {
+            word2[i] as usize
+        } else {
+            return Err(err_message);
+        }] -= 1;
+    }
+
+    Ok(counts.iter().all(|v| *v == 0))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -115,6 +142,30 @@ mod tests {
         for (word1, word2, expected) in test_table {
             // act
             let res = is_anagram_array(word1, word2);
+
+            // assert
+            assert_eq!(res, expected, "Test {}:{}", word1, word2);
+        }
+    }
+
+    #[test]
+    fn is_anagram_ascii_array_tests() {
+        // arrange
+        let test_table: Vec<(&'static str, &'static str, Result<bool, &'static str>)> = vec![
+            ("abc", "cba", Ok(true)),
+            ("abc", "caa", Ok(false)),
+            ("abc", "acba", Ok(false)),
+            ("roma", "amor", Ok(true)),
+            ("leadership", "dealership", Ok(true)),
+            ("leadership", "dealershii", Ok(false)),
+            ("横山ダニエル", "ダニエル横山", Err("invalid character")),
+            ("横山ダニエル", "横山daniel", Ok(false)),
+            ("横山ダニエル", "横山dani", Err("invalid character")),
+        ];
+
+        for (word1, word2, expected) in test_table {
+            // act
+            let res = is_anagram_ascii_array(word1, word2);
 
             // assert
             assert_eq!(res, expected, "Test {}:{}", word1, word2);
