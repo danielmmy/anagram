@@ -70,6 +70,22 @@ pub fn is_anagram_ascii_array(
     Ok(counts.iter().all(|v| *v == 0))
 }
 
+pub fn is_anagram_ascii_array_panics(word1: impl Into<String>, word2: impl Into<String>) -> bool {
+    let word1: Vec<char> = Into::<String>::into(word1).chars().collect();
+    let word2: Vec<char> = Into::<String>::into(word2).chars().collect();
+    const ASCII_SIZE: usize = 256;
+    if word1.len() != word2.len() {
+        return false;
+    }
+    let mut counts: [i16; ASCII_SIZE] = [0; ASCII_SIZE];
+    for i in 0..word1.len() {
+        counts[word1[i] as usize] += 1;
+        counts[word2[i] as usize] -= 1;
+    }
+
+    counts.iter().all(|v| *v == 0)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -168,5 +184,33 @@ mod tests {
             // assert
             assert_eq!(res, expected, "Test {}:{}", word1, word2);
         }
+    }
+
+    #[test]
+    fn is_anagram_ascii_array_panics_tests() {
+        // arrange
+        let test_table: Vec<(&'static str, &'static str, bool)> = vec![
+            ("abc", "cba", true),
+            ("abc", "caa", false),
+            ("abc", "acba", false),
+            ("roma", "amor", true),
+            ("leadership", "dealership", true),
+            ("leadership", "dealershii", false),
+        ];
+
+        for (word1, word2, expected) in test_table {
+            // act
+            let res = is_anagram_ascii_array_panics(word1, word2);
+
+            // assert
+            assert_eq!(res, expected, "Test {}:{}", word1, word2);
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "index out of bounds")]
+    fn is_anagram_ascii_array_panics_invalid_tests() {
+        // act
+        _ = is_anagram_ascii_array_panics("横山ダニエル", "横山ダニエル");
     }
 }
