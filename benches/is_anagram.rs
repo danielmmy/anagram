@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use anagram::{is_anagram_map, is_anagram_sort};
+use anagram::{is_anagram_array, is_anagram_hashmap, is_anagram_sort};
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::{distributions::Alphanumeric, Rng};
 
@@ -25,35 +25,38 @@ fn large_test_data() -> &'static (String, String) {
     })
 }
 
-fn is_anagram_map_bench0(c: &mut Criterion) {
+fn is_anagram_hashmap_bench0(c: &mut Criterion) {
     let word1 = "leadership";
     let word2 = "dealershi";
-    c.bench_function(&format!("Map test with {word1} and {word2}"), |b| {
-        b.iter(|| is_anagram_map(word1, word2))
+    c.bench_function(&format!("Hashmap test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_hashmap(word1, word2))
     });
 }
 
-fn is_anagram_map_bench1(c: &mut Criterion) {
+fn is_anagram_hashmap_bench1(c: &mut Criterion) {
     let word1 = "leadership";
     let word2 = "dealershii";
-    c.bench_function(&format!("Map test with {word1} and {word2}"), |b| {
-        b.iter(|| is_anagram_map(word1, word2))
+    c.bench_function(&format!("Hashmap test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_hashmap(word1, word2))
     });
 }
 
-fn is_anagram_map_bench2(c: &mut Criterion) {
+fn is_anagram_hashmap_bench2(c: &mut Criterion) {
     let word1 = "leadership";
     let word2 = "dealership";
-    c.bench_function(&format!("Map test with {word1} and {word2}"), |b| {
-        b.iter(|| is_anagram_map(word1, word2))
+    c.bench_function(&format!("Hashmap test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_hashmap(word1, word2))
     });
 }
 
-fn is_anagram_map_bench3(c: &mut Criterion) {
+fn is_anagram_hashmap_bench3(c: &mut Criterion) {
     let words = large_test_data();
     c.bench_function(
-        &format!("Map test large({CAPS}) with {} and {}", words.0, words.1),
-        |b| b.iter(|| is_anagram_map(&words.0, &words.0)),
+        &format!(
+            "Hashmap test large({CAPS}) with {} and {}",
+            words.0, words.1
+        ),
+        |b| b.iter(|| is_anagram_hashmap(&words.0, &words.0)),
     );
 }
 
@@ -89,16 +92,52 @@ fn is_anagram_sort_bench3(c: &mut Criterion) {
     );
 }
 
+fn is_anagram_array_bench0(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealershi";
+    c.bench_function(&format!("Array test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_array(word1, word2))
+    });
+}
+
+fn is_anagram_array_bench1(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealershii";
+    c.bench_function(&format!("Array test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_array(word1, word2))
+    });
+}
+
+fn is_anagram_array_bench2(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealership";
+    c.bench_function(&format!("Array test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_array(word1, word2))
+    });
+}
+
+fn is_anagram_array_bench3(c: &mut Criterion) {
+    let words = large_test_data();
+    c.bench_function(
+        &format!("Array test large({CAPS}) with {} and {}", words.0, words.1),
+        |b| b.iter(|| is_anagram_array(&words.0, &words.0)),
+    );
+}
+
 criterion_group!(
     benches,
-    is_anagram_map_bench0,
+    is_anagram_hashmap_bench0,
     is_anagram_sort_bench0,
-    is_anagram_map_bench1,
+    is_anagram_array_bench0,
+    is_anagram_hashmap_bench1,
     is_anagram_sort_bench1,
-    is_anagram_map_bench2,
+    is_anagram_array_bench1,
+    is_anagram_hashmap_bench2,
     is_anagram_sort_bench2,
-    is_anagram_map_bench3,
+    is_anagram_array_bench2,
+    is_anagram_hashmap_bench3,
     is_anagram_sort_bench3,
+    is_anagram_array_bench3,
 );
 
 criterion_main!(benches);
