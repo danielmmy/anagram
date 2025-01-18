@@ -51,22 +51,20 @@ pub fn is_anagram_ascii_array(
 ) -> Result<bool, &'static str> {
     let word1: Vec<char> = Into::<String>::into(word1).chars().collect();
     let word2: Vec<char> = Into::<String>::into(word2).chars().collect();
+    const ASCII_SIZE: usize = 256;
     if word1.len() != word2.len() {
         return Ok(false);
     }
     let err_message = "invalid character";
-    let mut counts: [i16; 256] = [0; 256];
+    let mut counts: [i16; ASCII_SIZE] = [0; ASCII_SIZE];
     for i in 0..word1.len() {
-        counts[if word1[i].is_ascii() {
-            word1[i] as usize
-        } else {
+        let index1 = word1[i] as usize;
+        let index2 = word2[i] as usize;
+        if index1 > ASCII_SIZE || index2 > ASCII_SIZE {
             return Err(err_message);
-        }] += 1;
-        counts[if word2[i].is_ascii() {
-            word2[i] as usize
-        } else {
-            return Err(err_message);
-        }] -= 1;
+        }
+        counts[index1] += 1;
+        counts[index2] -= 1;
     }
 
     Ok(counts.iter().all(|v| *v == 0))
