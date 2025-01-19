@@ -1,8 +1,8 @@
 use std::sync::OnceLock;
 
 use anagram::{
-    is_anagram_ascii_array, is_anagram_ascii_array_panics, is_anagram_hashmap, is_anagram_sort,
-    is_anagram_vector,
+    is_anagram_ascii_array, is_anagram_ascii_array_panics, is_anagram_faster_hash,
+    is_anagram_hashmap, is_anagram_sort, is_anagram_vector,
 };
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::{distributions::Alphanumeric, Rng};
@@ -60,6 +60,41 @@ fn is_anagram_hashmap_bench3(c: &mut Criterion) {
             words.0, words.1
         ),
         |b| b.iter(|| is_anagram_hashmap(&words.0, &words.0)),
+    );
+}
+
+fn is_anagram_faster_hash_bench0(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealershi";
+    c.bench_function(&format!("Faster hash test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_faster_hash(word1, word2))
+    });
+}
+
+fn is_anagram_faster_hash_bench1(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealershii";
+    c.bench_function(&format!("Faster hash test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_faster_hash(word1, word2))
+    });
+}
+
+fn is_anagram_faster_hash_bench2(c: &mut Criterion) {
+    let word1 = "leadership";
+    let word2 = "dealership";
+    c.bench_function(&format!("Faster hash test with {word1} and {word2}"), |b| {
+        b.iter(|| is_anagram_faster_hash(word1, word2))
+    });
+}
+
+fn is_anagram_faster_hash_bench3(c: &mut Criterion) {
+    let words = large_test_data();
+    c.bench_function(
+        &format!(
+            "Faster hash test large({CAPS}) with {} and {}",
+            words.0, words.1
+        ),
+        |b| b.iter(|| is_anagram_faster_hash(&words.0, &words.0)),
     );
 }
 
@@ -203,21 +238,25 @@ fn is_anagram_ascii_array_panics_bench3(c: &mut Criterion) {
 criterion_group!(
     benches,
     is_anagram_hashmap_bench0,
+    is_anagram_faster_hash_bench0,
     is_anagram_sort_bench0,
     is_anagram_vector_bench0,
     is_anagram_ascii_array_bench0,
     is_anagram_ascii_array_panics_bench0,
     is_anagram_hashmap_bench1,
+    is_anagram_faster_hash_bench1,
     is_anagram_sort_bench1,
     is_anagram_vector_bench1,
     is_anagram_ascii_array_bench1,
     is_anagram_ascii_array_panics_bench1,
     is_anagram_hashmap_bench2,
+    is_anagram_faster_hash_bench2,
     is_anagram_sort_bench2,
     is_anagram_vector_bench2,
     is_anagram_ascii_array_bench2,
     is_anagram_ascii_array_panics_bench2,
     is_anagram_hashmap_bench3,
+    is_anagram_faster_hash_bench3,
     is_anagram_sort_bench3,
     is_anagram_vector_bench3,
     is_anagram_ascii_array_bench3,
