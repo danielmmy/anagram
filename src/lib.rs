@@ -30,7 +30,7 @@ pub fn is_anagram_hashmap(word1: impl Into<String>, word2: impl Into<String>) ->
     map.values().all(|v| *v == 0)
 }
 
-pub fn is_anagram_array(word1: impl Into<String>, word2: impl Into<String>) -> bool {
+pub fn is_anagram_vector(word1: impl Into<String>, word2: impl Into<String>) -> bool {
     let word1: Vec<char> = Into::<String>::into(word1).chars().collect();
     let word2: Vec<char> = Into::<String>::into(word2).chars().collect();
     if word1.len() != word2.len() {
@@ -139,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn is_anagram_array_tests() {
+    fn is_anagram_vector_tests() {
         // arrange
         let test_table: Vec<(&'static str, &'static str, bool)> = vec![
             ("abc", "cba", true),
@@ -155,7 +155,7 @@ mod tests {
 
         for (word1, word2, expected) in test_table {
             // act
-            let res = is_anagram_array(word1, word2);
+            let res = is_anagram_vector(word1, word2);
 
             // assert
             assert_eq!(res, expected, "Test {}:{}", word1, word2);
